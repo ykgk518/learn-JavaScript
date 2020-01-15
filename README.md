@@ -202,3 +202,38 @@ alert( undefined == 0 ); // false (3)
 
 この三つはブラウザの機能。
 
+# 反復可能なオブジェクトについて
+反復可能な(iterable)オブジェクトはforループで任意のオブジェクトを使用できるためのオブジェクトの概念です。
+配列は反復可能ですが、配列だけが反復可能ではなく、文字列も反復可能です。
+
+```JavaScript
+let range = {
+    from: 1,
+    to: 5
+};
+```
+
+`range`をiterableにするためには`Symbol.iterator`というメソッドをオブジェクトに追加する必要があります。
+
+```JavaScript
+range[Symbol.iterator] = function() {
+    return {
+        current: this.from,
+        last: this.to,
+
+        next() {
+            if (this.current <= this.last) {
+                return { done: false, value: this.current++};
+            } else {
+                return { done: true};
+            }
+        }
+    };
+};
+```
+
+`range[Symbol.iterator]()`の呼び出しで生成され、反復を処理します。
+ここで`next()`の結果は必ず{done: Boolean, value: any}の形式です。
+`done: true`で繰り返しが終了したことを意味します。
+
+
