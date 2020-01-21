@@ -1,6 +1,5 @@
 # learn-JavaScript
 
-**読書感想文じゃあーー！！**
 
 
 
@@ -503,8 +502,142 @@ setTimeout(() => { clearInterval(timerId); alert('stop'); }, 5000);
 ```
 
 
+## デコレータ
+
+デコレータとは任意の関数に対して振る舞いを変更する関数のことを指します。
 
 
+下記コードの説明です。仮に頻繁に呼び出される関数があったとします。頻繁に呼び出される関数に対して、再計算を行わず結果をキャッシュしておく機能を追加したデコレータの実装です。
+
+```JavaScript
+fucntion slow(x) {
+    alert('Call with ${x}');
+    return x;
+}
+
+function cachingDecorator(func) {
+    let cache = new Map();
+
+    return function(x) {
+        if (cache.has(x)) {
+            return cache.get(x);
+        }
+
+        let result = func(x);
+
+        cache.set(x, result);
+        return result;
+    };
+}
+
+slow = cachingDecorator(slow);
+
+alert(slow(1));
+alert(slow(2));
+
+```
+
+このような実装を行ったデコレータにはいくつかのメリットが挙げられます。
+* デコレータ(`cachingDecorator`)は再利用可能であること
+* `slow`自身の複雑性は増加しない
+* 複数のデコレータと組み合わせることができます。
+
+
+
+上記コードのようにオブジェクトメソッドで動作するには適していません。
+
+```JavaScript
+
+let worker = {
+    someMethod() {
+        return 1;
+    },
+
+    slow(x) {
+        alert('Call with ${x}');
+        return x * this.someMethod();
+    }
+};
+
+function cachingDecorator(func) {
+    let cache = new Map();
+
+    return function(x) {
+        if (cache.has(x)) {
+            return cache.get(x);
+        }
+
+        let result = func(x);
+
+        cache.set(x, result);
+        return result;
+    };
+}
+
+alert(worker.slow(1));
+
+worker.slow = cachingDecorator(worker.slow);
+
+alert(worker.slow(2));//「Call with 2」 の後の結果がTypeError: this is undefined
+
+```
+
+### func.call()について
+
+`function cachingDecorator(func)`の`let result = func(x);`の実装にて、`func(x)`として呼び出されているため、`this is undefined`となります。
+
+これを修正する方法として組み込みの関数メソッド[func.call(obj, arg1, arg2, ...)](https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/Function/call)を使用する方法があります。
+
+```JavaScript
+function sayName() {
+    alert(this.name);
+}
+
+let user = { name: "John"};
+let admin = { name: "Admin"};
+
+sayName.call(user);
+sayName.call(admin);
+```
+
+```JavaScript
+
+let worker = {
+    someMethod() {
+        return 1;
+    },
+
+    slow(x) {
+        alert('Call with ${x}');
+        return x * this.someMethod();
+    }
+};
+
+function cachingDecorator(func) {
+    let cache = new Map();
+
+    return function(x) {
+        if (cache.has(x)) {
+            return cache.get(x);
+        }
+
+        let result = func.call(this, x);
+
+        cache.set(x, result);
+        return result;
+    };
+}
+
+alert(worker.slow(1));
+
+worker.slow = cachingDecorator(worker.slow);
+
+alert(worker.slow(2));
+```
+
+### func.apply()について
+
+`func.call()`では単一の引数を考えていました。
 
 
 
