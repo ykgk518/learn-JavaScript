@@ -161,6 +161,27 @@ undefined の意味は “値は代入されていません” です。
 
 ## 型変換
 
+## 論理演算子
+JavaScriptにはOR(`||`)、AND(`&&`)、NOT(`!`)の3つの論理演算子があります。
+これらの論理演算子はBoolean型だけでなく、どの方の値にも適用することができます。
+
+### OR:論理和
+JavaScriptでは、論理和が対象とする引数あるいはオペランドがBooleanでない場合、評価のためにBooleanに変換されます。
+例えば数値`1`は`true`として変換され、数値`0`は`false`となります。
+
+```JavaScript
+//結果:true
+if (1 || 0) {
+    alert('true')
+}
+
+```
+ほとんどの場合、論理演算子は、if文などで使用されるますが、組み込みの関数のような操作もできます。
+
+
+
+
+
 ### 数値変換のルール
 
 * `undefined`→`NaN`
@@ -639,6 +660,53 @@ alert(worker.slow(2));
 
 `func.call()`では単一の引数を考えていました。
 
+## 関数バインディングについて
+オブジェクトメソッド`setTimeout`使ったり、オブジェクトメソッドを渡す場合、`this`が`undefined`になる場合があります。
+
+以下、例
+
+```JavaScript
+let user = {
+    firstName: "Taro",
+    sayHi() {
+        alert('Hello! ${this.firstName}!');
+    }
+};
+
+setTimeout(user.sayHi, 1000);//Hello! undefined!
+
+```
+
+**ブラウザ**では、`setTimeout`メソッドが呼びだされる時、`this`は`window`を指します。
+`this.firstName`は`window.firstName`を取得しようとするため、`this`は`undefined`になります。
+
+主な解決手段は2つ。
+
+* ラップされた関数を使う
+* `bind`を使用する
+
+
+### ラップされた関数を使用する。
+先のコードをラップされた関数を用いて使用してみます。
+
+```JavaScript
+
+let user = {
+    firstName: "Taro",
+    sayHi() {
+        alert('Hello! ${this.firstName}!');
+    }
+};
+
+setTimeout(function() {
+    user.sayHi(); //Hello! Taro!
+}, 1000)
+
+```
+
+
+
+### `bind`を使用する。
 
 
 
