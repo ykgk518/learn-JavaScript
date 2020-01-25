@@ -3,11 +3,12 @@
 # はじめに
 JavaScriptの巻き上げ処理について理解してなく、そのあたりでハマったので、変数宣言から学び直しました。
 
->`let`文はブロックスコープの局所変数を宣言します。
-https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Statements/let
+~~>`let`文はブロックスコープの局所変数を宣言します。~~
+https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Statements/let~
 
 
-ブロックスコープと
+# スコープについて
+letとconstは
 
 
 ## let,const,var
