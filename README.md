@@ -1,9 +1,5 @@
 # learn-JavaScript
 
-**読書感想文じゃあーー！！**
-
-
-
 # JavaScript入門
 
 ## JavaScriptとは？
@@ -162,6 +158,27 @@ undefined の意味は “値は代入されていません” です。
 
 ## 型変換
 
+## 論理演算子
+JavaScriptにはOR(`||`)、AND(`&&`)、NOT(`!`)の3つの論理演算子があります。
+これらの論理演算子はBoolean型だけでなく、どの方の値にも適用することができます。
+
+### OR:論理和
+JavaScriptでは、論理和が対象とする引数あるいはオペランドがBooleanでない場合、評価のためにBooleanに変換されます。
+例えば数値`1`は`true`として変換され、数値`0`は`false`となります。
+
+```JavaScript
+//結果:true
+if (1 || 0) {
+    alert('true')
+}
+
+```
+ほとんどの場合、論理演算子は、if文などで使用されるますが、組み込みの関数のような操作もできます。
+
+
+
+
+
 ### 数値変換のルール
 
 * `undefined`→`NaN`
@@ -235,5 +252,459 @@ range[Symbol.iterator] = function() {
 `range[Symbol.iterator]()`の呼び出しで生成され、反復を処理します。
 ここで`next()`の結果は必ず{done: Boolean, value: any}の形式です。
 `done: true`で繰り返しが終了したことを意味します。
+
+
+
+# 関数について
+
+## 関数は任意の数の引数をサポートする
+
+
+```JavaScript
+
+fuction sum(a, b) {
+  return a + b;
+}
+
+alert( sum(1, 2, 3, 4, 5));//結果:3
+
+```
+
+関数が定義された際は、引数を2つとして定義しています。
+ここで、**定義された関数を呼び出された際は、5つの引数を指定していますが、必要以上の引数でもエラーになりません。**
+エラーにはなりませんが、最初の2つだけが使用されます。
+
+## 任意の数のパラメータは3つのドットを関数定義で記述できる
+
+```JavaScript
+
+fuction sumAll(...args) {
+    let sum = 0;
+
+    for (let arg of args) sum += arg;
+
+    return sum;
+}
+alert( sumAll(1));//結果:1
+alert( sumAll(1, 2)) //結果:3
+alert( sumAll(1, 2, 3))//結果:6
+```
+
+`...args`の意味するところはパラメータを配列にまとめることであり、`args`は配列名として扱われます。
+
+## 最初のパラメータと残りのパラメータについて
+
+```JavaScript
+
+function showName(firstName, lastName, ...titles) {
+    alert( firstName + '' + lastName );
+
+    alert( titles[0] );
+    alert( titles[1] );
+    alert( titles[2] );
+    alert( titles.length );
+}
+
+showName("一郎", "花子", "次郎", "三郎");
+
+
+```
+
+## `arguments`変数によりすべての引数を取得することができる
+
+```JavaScript
+
+function showName () {
+    alert( arguments.length );
+    alert( arguments[0]);
+    alert( arguments[1]);
+}
+
+showName("太郎", "花子")
+//結果:2, 太郎,　花子
+showName("太郎")
+//結果:1, 太郎, undefined
+```
+
+`arguments`の注意点:
+* 配列ではなく配列ライクである
+* 反復可能である
+* アロー関数は`arguments`を持たない
+
+## スプレッド演算子を使って反復可能オブジェクトを引数に展開する
+
+スプレッド演算子(`...`)はどのような場面で使われるか。
+例えば、リストから最大値を返す組み込み関数を使用するときに使われます。
+
+```JavaScript
+
+alert( Math.max(3, 5, 1)); //5
+
+let arr = [3, 5, 1];
+alert( Math.max(arr));//NaN
+
+```
+
+上記コードで配列として保持している変数(`arr`)を引数の中で展開したい場合に使用する。
+
+```JavaScript
+let arr = [3, 5, 1];
+
+alert( Math.max(...arr)); //5
+
+let arr1 = [1, 2, 3 ,4];
+let arr2 = [1, 2, 3, 5];
+
+alert( Math.max(...arr1, ..arr2) );//5
+```
+
+## 配列をマージするためにスプレッド演算子を使用する
+
+通常の値とスプレッド演算子を組み合わせることで配列をマージすることができます。
+
+```JavaScript
+let arr = [3, 5, 1];
+let arr2 = [8, 9, 15];
+
+let merged = [0, ...arr, 2, ...arr2];
+
+alert(merged); // 0,3,5,1,2,8,9,15 (0, then arr, then 2, then arr2)
+```
+
+## レキシカル環境とは？
+
+レキシカル環境とはなんであるか
+
+JSではすべての実行中の関数やコードブロック、スクリプト全体は**レキシカル環境**と呼ばれる関連オブジェクトを持っている。
+
+レキシカル環境オブジェクトは2つの部分から構成されている。（この辺が意味わからん）
+* 環境レコード。プロパティとしてすべてのローカル変数をもつオブジェクトであること
+* 外部のレキシカル環境への参照。通常、直近の外部のレキシカルなコードに関連付けられている。
+
+これにより、変数は特別な内部オブジェクト、環境レコードのプロパティである。
+変数を取得、変更するとは、そのオブジェクトのプロパティを取得または変更するということである。
+
+→（自分の見解）変数や関数はオブジェクトとして扱われ、プロパティ（アトリビュート）を保持している。
+
+レキシカル環境とは一体何であるかをつかむために、下記のコードにおいて、レキシカル環境が変わる様子を示す。
+
+```JavaScript
+
+let phrase;
+
+phrase = "Hello";
+phrase = "Bye";
+
+```
+
+1.スクリプト開始時、レキシカル環境は空
+2.`let phrase`が定義された。初期値がないため、`undefined`が格納される
+3.`phrase`が代入される
+4.`phrase`が新しい値を参照する
+
+
+**要約**(これがいまいちピンとこない）
+変数は特別な内部オブジェクトのプロパティで、現在の実行ブロック/関数/スクリプトと関連付けられています。
+変数を使った作業は、実際にはそのオブジェクトのプロパティを使って作業しています
+
+**関数呼び出しの間、2つのレキシカル環境がある。**
+内部と外部→ローカル変数とグローバル変数
+
+### 自分のレキシカル環境に対するイメージ
+レキシカル環境とは変数や関数が定義あるいは宣言され、格納されている場所そのもののことを指す。
+変数にアクセスする時、最初に内部のレキシカル環境を探し、次に外部のレキシカル環境で検索する。
+
+
+## コードブロックとループについてのレキシカル環境
+レキシカル環境はコードブロックにも存在します。
+コードブロックが実行され、ブロック内のローカル変数を含む時それらが作成されます。
+
+### if
+
+```JavaScript
+let pharse = "こんにちは"
+
+if (true) {
+    let user = "太郎"
+
+    alert(`$(phrase), $(user)`)
+}
+
+alert(user);// エラー can't see such variable!
+```
+
+実行が`if`ブロックに来た時、`if`だけのレキシカル環境が作成されます。
+作成されたレキシカル環境はその外部への参照をもつめ`phrase`を見つけることができます。
+しかし、`if`の中で宣言されたすべての変数と関数式はレキシカル環境の中にあり、外部からは見えません。
+例えば、`if`が終わった後にある`alert`は`user`が見えないためエラーになります。
+
+## let,const,var
+`let`,`const`はレキシカル環境に関してまったく同じように振る舞います。
+
+`var`,`let`の違いは、
+* `var`変数のスコープは関数全体かグローバルのいずれかである。
+* `var`は関数の開始で処理される。
+
+
+```JavaScript
+
+if (true) {
+    var testvar = true;
+    let testlet
+}
+
+alert(testvar); //結果:true
+alert(testlet); //結果:testlet is not defined
+```
+
+
+`var`による変数宣言は関数の開始時に処理されます。
+しかし、変数は代入されるまでは`undefined`です。
+```JavaScript
+
+function sayHi() {
+    phrase = "Hello";
+
+    alert(phrase);
+
+    var phrase;
+}
+```
+
+上記のコードは以下のコードと同じです。
+
+```JavaScript
+function sayHi() {
+    var phrase;
+   
+    phrase = "Hello";
+
+    alert(phrase);
+
+}
+```
+
+## スケジューリングについて
+
+関数をすぐには実行させず、ある時点で実行するようにしたいことがあります。
+
+そのために2つのメソッドがあります。
+* `setTimeout`:指定時間経過後、一度だけ関数を実行します。
+* `setInterval`:指定した間隔で、定期的に関数を実行します。
+
+## setTimeout
+
+`setTimeout`の構文
+`let timerId = setTimeout(func|code, delay[, arg1, arg2...])`
+
+引数について
+
+* `func|code`:関数もしくはコードの文字列。通常は関数であり、コードの文字列は推奨されていない
+* `delay`:実行前の遅延時間であり、単位はミリ秒
+* `arg1,arg2...`:関数の引数。
+
+
+## setInterval
+
+`setInterval`の構文は`setTimeout`と同じ。
+`let timerId = setInterval(func|code, delay[, arg1, arg2...])`
+
+呼び出しを停止する際は`clearInterval()`を使用します。
+
+```JavaScript
+//2秒のインターバルで繰り返し
+let timerId = setInterval(() => alert('tick'), 2000);
+
+//5秒後に停止
+setTimeout(() => { clearInterval(timerId); alert('stop'); }, 5000);
+```
+
+
+## デコレータ
+
+デコレータとは任意の関数に対して振る舞いを変更する関数のことを指します。
+
+
+下記コードの説明です。仮に頻繁に呼び出される関数があったとします。頻繁に呼び出される関数に対して、再計算を行わず結果をキャッシュしておく機能を追加したデコレータの実装です。
+
+```JavaScript
+fucntion slow(x) {
+    alert('Call with ${x}');
+    return x;
+}
+
+function cachingDecorator(func) {
+    let cache = new Map();
+
+    return function(x) {
+        if (cache.has(x)) {
+            return cache.get(x);
+        }
+
+        let result = func(x);
+
+        cache.set(x, result);
+        return result;
+    };
+}
+
+slow = cachingDecorator(slow);
+
+alert(slow(1));
+alert(slow(2));
+
+```
+
+このような実装を行ったデコレータにはいくつかのメリットが挙げられます。
+* デコレータ(`cachingDecorator`)は再利用可能であること
+* `slow`自身の複雑性は増加しない
+* 複数のデコレータと組み合わせることができます。
+
+
+
+上記コードのようにオブジェクトメソッドで動作するには適していません。
+
+```JavaScript
+
+let worker = {
+    someMethod() {
+        return 1;
+    },
+
+    slow(x) {
+        alert('Call with ${x}');
+        return x * this.someMethod();
+    }
+};
+
+function cachingDecorator(func) {
+    let cache = new Map();
+
+    return function(x) {
+        if (cache.has(x)) {
+            return cache.get(x);
+        }
+
+        let result = func(x);
+
+        cache.set(x, result);
+        return result;
+    };
+}
+
+alert(worker.slow(1));
+
+worker.slow = cachingDecorator(worker.slow);
+
+alert(worker.slow(2));//「Call with 2」 の後の結果がTypeError: this is undefined
+
+```
+
+### func.call()について
+
+`function cachingDecorator(func)`の`let result = func(x);`の実装にて、`func(x)`として呼び出されているため、`this is undefined`となります。
+
+これを修正する方法として組み込みの関数メソッド[func.call(obj, arg1, arg2, ...)](https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/Function/call)を使用する方法があります。
+
+```JavaScript
+function sayName() {
+    alert(this.name);
+}
+
+let user = { name: "John"};
+let admin = { name: "Admin"};
+
+sayName.call(user);
+sayName.call(admin);
+```
+
+```JavaScript
+
+let worker = {
+    someMethod() {
+        return 1;
+    },
+
+    slow(x) {
+        alert('Call with ${x}');
+        return x * this.someMethod();
+    }
+};
+
+function cachingDecorator(func) {
+    let cache = new Map();
+
+    return function(x) {
+        if (cache.has(x)) {
+            return cache.get(x);
+        }
+
+        let result = func.call(this, x);
+
+        cache.set(x, result);
+        return result;
+    };
+}
+
+alert(worker.slow(1));
+
+worker.slow = cachingDecorator(worker.slow);
+
+alert(worker.slow(2));
+```
+
+### func.apply()について
+
+`func.call()`では単一の引数を考えていました。
+
+## 関数バインディングについて
+オブジェクトメソッド`setTimeout`使ったり、オブジェクトメソッドを渡す場合、`this`が`undefined`になる場合があります。
+
+以下、例
+
+```JavaScript
+let user = {
+    firstName: "Taro",
+    sayHi() {
+        alert('Hello! ${this.firstName}!');
+    }
+};
+
+setTimeout(user.sayHi, 1000);//Hello! undefined!
+
+```
+
+**ブラウザ**では、`setTimeout`メソッドが呼びだされる時、`this`は`window`を指します。
+`this.firstName`は`window.firstName`を取得しようとするため、`this`は`undefined`になります。
+
+主な解決手段は2つ。
+
+* ラップされた関数を使う
+* `bind`を使用する
+
+
+### ラップされた関数を使用する。
+先のコードをラップされた関数を用いて使用してみます。
+
+```JavaScript
+
+let user = {
+    firstName: "Taro",
+    sayHi() {
+        alert('Hello! ${this.firstName}!');
+    }
+};
+
+setTimeout(function() {
+    user.sayHi(); //Hello! Taro!
+}, 1000)
+
+```
+
+
+
+
+
+
 
 
