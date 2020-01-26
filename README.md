@@ -1,8 +1,5 @@
 # learn-JavaScript
 
-
-
-
 # JavaScript入門
 
 ## JavaScriptとは？
@@ -706,7 +703,6 @@ setTimeout(function() {
 
 
 
-### `bind`を使用する。
 
 
 
