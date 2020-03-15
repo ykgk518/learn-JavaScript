@@ -6,16 +6,16 @@ let range = {
 // for..of が動作するようにしたい
 // for(let num of range) ... num=1,2,3,4,5
 
-range[Symbol.iterator] = function() {
+range[Symbol.iterator] = function () {
     return {
         current: this.from,
         last: this.to,
 
         next() {
             if (this.current <= this.last) {
-                return { done: false, value: this.current++};
+                return { done: false, value: this.current++ };
             } else {
-                return { done: true};
+                return { done: true };
             }
         }
     };
@@ -24,3 +24,4 @@ range[Symbol.iterator] = function() {
 for (let num of range) {
     alert(num)
 }
+
